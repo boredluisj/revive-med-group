@@ -3,7 +3,6 @@
 import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useInView } from "framer-motion";
 import HeroParallax from "@/components/HeroParallax";
 import StatsCounter from "@/components/StatsCounter";
 import ServiceCard from "@/components/ServiceCard";
@@ -14,7 +13,7 @@ import { services } from "@/lib/services";
 
 const EASE = "cubic-bezier(0.25, 0.46, 0.45, 0.94)";
 
-/* ── Reliable fade-up wrapper (CSS transitions, not framer-motion animate) ── */
+/* ── Reliable fade-up: native IntersectionObserver, no framer-motion ── */
 function FadeIn({
   children,
   className = "",
@@ -25,23 +24,32 @@ function FadeIn({
   delay?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, amount: 0.15 });
-  const [mounted, setMounted] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    requestAnimationFrame(() => setMounted(true));
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
-
-  const active = mounted && isInView;
 
   return (
     <div
       ref={ref}
       className={className}
       style={{
-        opacity: active ? 1 : 0,
-        transform: active ? "translateY(0px)" : "translateY(22px)",
-        transition: mounted
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0px)" : "translateY(22px)",
+        transition: visible
           ? `opacity 0.65s ${EASE} ${delay}s, transform 0.65s ${EASE} ${delay}s`
           : "none",
         willChange: "opacity, transform",
@@ -52,7 +60,7 @@ function FadeIn({
   );
 }
 
-/* ── Stagger row — children cascade in via nth-child delay ── */
+/* ── Stagger row: native IntersectionObserver, cascading delays ── */
 function StaggerRow({
   children,
   className = "",
@@ -65,14 +73,23 @@ function StaggerRow({
   stagger?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, amount: 0.1 });
-  const [mounted, setMounted] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    requestAnimationFrame(() => setMounted(true));
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
-
-  const active = mounted && isInView;
 
   return (
     <div ref={ref} className={className}>
@@ -81,9 +98,9 @@ function StaggerRow({
             <div
               key={i}
               style={{
-                opacity: active ? 1 : 0,
-                transform: active ? "translateY(0px)" : "translateY(22px)",
-                transition: mounted
+                opacity: visible ? 1 : 0,
+                transform: visible ? "translateY(0px)" : "translateY(22px)",
+                transition: visible
                   ? `opacity 0.6s ${EASE} ${baseDelay + i * stagger}s, transform 0.6s ${EASE} ${baseDelay + i * stagger}s`
                   : "none",
                 willChange: "opacity, transform",

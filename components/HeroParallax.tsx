@@ -1,36 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useReducedMotion } from "framer-motion";
 
 const HEADLINE = "Experience the Revive Difference";
 const WORDS = HEADLINE.split(" ");
-
 const EASE = "cubic-bezier(0.25, 0.46, 0.45, 0.94)";
 
-function transition(delay: number, duration = 0.75) {
-  return `opacity ${duration}s ${EASE} ${delay}s, transform ${duration}s ${EASE} ${delay}s`;
-}
-
-function fadeStyle(active: boolean, delay: number, reduced: boolean, duration = 0.75) {
-  if (reduced) return {};
-  return {
-    opacity: active ? 1 : 0,
-    transform: active ? "translateY(0px)" : "translateY(28px)",
-    transition: active ? transition(delay, duration) : "none",
-    willChange: "opacity, transform",
-  };
-}
-
 export default function HeroParallax() {
-  const prefersReducedMotion = useReducedMotion() ?? false;
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    requestAnimationFrame(() => setMounted(true));
-  }, []);
-
   return (
     <section className="relative min-h-[90vh] md:min-h-screen overflow-hidden">
       {/* Background */}
@@ -43,17 +19,10 @@ export default function HeroParallax() {
         sizes="100vw"
       />
 
-      {/* Overlay */}
+      {/* Overlay — CSS fadeIn, no JS */}
       <div
         className="absolute inset-0 bg-linear-to-r from-black/55 via-black/35 to-transparent"
-        style={
-          prefersReducedMotion
-            ? {}
-            : {
-                opacity: mounted ? 1 : 0,
-                transition: mounted ? `opacity 1.0s ease-out 0s` : "none",
-              }
-        }
+        style={{ animation: `heroFadeIn 1.0s ease-out 0s both` }}
       />
 
       {/* Content */}
@@ -63,7 +32,7 @@ export default function HeroParallax() {
           {/* Chad headshot — desktop only */}
           <div
             className="hidden md:block w-full md:w-[40%] flex-shrink-0"
-            style={fadeStyle(mounted, 0.1, prefersReducedMotion)}
+            style={{ animation: `heroFadeUp 0.75s ${EASE} 0.1s both` }}
           >
             <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl max-w-sm mx-auto">
               <Image
@@ -89,19 +58,9 @@ export default function HeroParallax() {
                 <span
                   key={i}
                   className="inline-block mr-[0.25em]"
-                  style={
-                    prefersReducedMotion
-                      ? {}
-                      : {
-                          opacity: mounted ? 1 : 0,
-                          transform: mounted ? "translateY(0px)" : "translateY(20px)",
-                          filter: mounted ? "blur(0px)" : "blur(4px)",
-                          transition: mounted
-                            ? `opacity 0.65s ${EASE} ${0.15 + i * 0.09}s, transform 0.65s ${EASE} ${0.15 + i * 0.09}s, filter 0.65s ${EASE} ${0.15 + i * 0.09}s`
-                            : "none",
-                          willChange: "opacity, transform, filter",
-                        }
-                  }
+                  style={{
+                    animation: `heroWordIn 0.65s ${EASE} ${0.15 + i * 0.09}s both`,
+                  }}
                 >
                   {word}
                 </span>
@@ -111,7 +70,7 @@ export default function HeroParallax() {
             {/* Subtitle */}
             <p
               className="text-lg sm:text-xl text-white/90 mb-8 max-w-lg leading-relaxed drop-shadow"
-              style={fadeStyle(mounted, 0.65, prefersReducedMotion)}
+              style={{ animation: `heroFadeUp 0.75s ${EASE} 0.65s both` }}
             >
               Personalized Hormone &amp; Regenerative Medicine for Your Best Self
             </p>
@@ -119,7 +78,7 @@ export default function HeroParallax() {
             {/* CTAs */}
             <div
               className="flex flex-col sm:flex-row items-center gap-4"
-              style={fadeStyle(mounted, 0.8, prefersReducedMotion)}
+              style={{ animation: `heroFadeUp 0.75s ${EASE} 0.8s both` }}
             >
               <a
                 href="/contact"
@@ -141,7 +100,7 @@ export default function HeroParallax() {
             {/* Google Reviews badge */}
             <div
               className="mt-8 flex items-center gap-3 justify-center md:justify-start"
-              style={fadeStyle(mounted, 0.95, prefersReducedMotion)}
+              style={{ animation: `heroFadeUp 0.75s ${EASE} 0.95s both` }}
             >
               <div className="flex items-center gap-1">
                 {[...Array(5)].map((_, i) => (

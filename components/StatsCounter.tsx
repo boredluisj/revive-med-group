@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
-import { useInView } from "framer-motion";
 
 interface Stat {
   number: number;
@@ -53,14 +52,23 @@ function CountUp({ target, suffix = "", inView }: { target: number; suffix: stri
 
 export default function StatsCounter({ stats }: StatsCounterProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, amount: 0.15 });
-  const [mounted, setMounted] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    requestAnimationFrame(() => setMounted(true));
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
-
-  const active = mounted && isInView;
 
   return (
     <div ref={ref} className="grid grid-cols-2 lg:grid-cols-4 gap-8">
@@ -69,16 +77,16 @@ export default function StatsCounter({ stats }: StatsCounterProps) {
           key={index}
           className="text-center"
           style={{
-            opacity: active ? 1 : 0,
-            transform: active ? "translateY(0px)" : "translateY(22px)",
-            transition: mounted
+            opacity: visible ? 1 : 0,
+            transform: visible ? "translateY(0px)" : "translateY(22px)",
+            transition: visible
               ? `opacity 0.65s ${EASE} ${index * 0.12}s, transform 0.65s ${EASE} ${index * 0.12}s`
               : "none",
             willChange: "opacity, transform",
           }}
         >
           <p className="text-5xl font-heading font-bold text-dark-slate mb-2">
-            <CountUp target={stat.number} suffix={stat.suffix || ""} inView={isInView} />
+            <CountUp target={stat.number} suffix={stat.suffix || ""} inView={visible} />
           </p>
           <p className="text-base text-primary/70">{stat.label}</p>
         </div>
