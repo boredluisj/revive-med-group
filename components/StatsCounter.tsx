@@ -57,17 +57,24 @@ export default function StatsCounter({ stats }: StatsCounterProps) {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.1 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
+    let raf: number;
+    let observer: IntersectionObserver;
+    raf = requestAnimationFrame(() => {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setVisible(true);
+            observer.disconnect();
+          }
+        },
+        { threshold: 0.1 }
+      );
+      observer.observe(el);
+    });
+    return () => {
+      cancelAnimationFrame(raf);
+      observer?.disconnect();
+    };
   }, []);
 
   return (
@@ -79,9 +86,7 @@ export default function StatsCounter({ stats }: StatsCounterProps) {
           style={{
             opacity: visible ? 1 : 0,
             transform: visible ? "translateY(0px)" : "translateY(22px)",
-            transition: visible
-              ? `opacity 0.65s ${EASE} ${index * 0.12}s, transform 0.65s ${EASE} ${index * 0.12}s`
-              : "none",
+            transition: `opacity 0.65s ${EASE} ${index * 0.12}s, transform 0.65s ${EASE} ${index * 0.12}s`,
             willChange: "opacity, transform",
           }}
         >

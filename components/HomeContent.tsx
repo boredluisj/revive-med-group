@@ -29,17 +29,26 @@ function FadeIn({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.1 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
+    // RAF ensures browser paints opacity:0 before IO can fire,
+    // so the transition always animates from a painted invisible state
+    let raf: number;
+    let observer: IntersectionObserver;
+    raf = requestAnimationFrame(() => {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setVisible(true);
+            observer.disconnect();
+          }
+        },
+        { threshold: 0.1 }
+      );
+      observer.observe(el);
+    });
+    return () => {
+      cancelAnimationFrame(raf);
+      observer?.disconnect();
+    };
   }, []);
 
   return (
@@ -49,9 +58,7 @@ function FadeIn({
       style={{
         opacity: visible ? 1 : 0,
         transform: visible ? "translateY(0px)" : "translateY(22px)",
-        transition: visible
-          ? `opacity 0.65s ${EASE} ${delay}s, transform 0.65s ${EASE} ${delay}s`
-          : "none",
+        transition: `opacity 0.65s ${EASE} ${delay}s, transform 0.65s ${EASE} ${delay}s`,
         willChange: "opacity, transform",
       }}
     >
@@ -78,17 +85,24 @@ function StaggerRow({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.05 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
+    let raf: number;
+    let observer: IntersectionObserver;
+    raf = requestAnimationFrame(() => {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setVisible(true);
+            observer.disconnect();
+          }
+        },
+        { threshold: 0.05 }
+      );
+      observer.observe(el);
+    });
+    return () => {
+      cancelAnimationFrame(raf);
+      observer?.disconnect();
+    };
   }, []);
 
   return (
@@ -100,9 +114,7 @@ function StaggerRow({
               style={{
                 opacity: visible ? 1 : 0,
                 transform: visible ? "translateY(0px)" : "translateY(22px)",
-                transition: visible
-                  ? `opacity 0.6s ${EASE} ${baseDelay + i * stagger}s, transform 0.6s ${EASE} ${baseDelay + i * stagger}s`
-                  : "none",
+                transition: `opacity 0.6s ${EASE} ${baseDelay + i * stagger}s, transform 0.6s ${EASE} ${baseDelay + i * stagger}s`,
                 willChange: "opacity, transform",
               }}
             >
