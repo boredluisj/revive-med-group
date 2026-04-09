@@ -17,29 +17,24 @@ function FadeIn({
   children,
   className = "",
   delay = 0,
-  clipReveal = false,
 }: {
   children: React.ReactNode;
   className?: string;
   delay?: number;
-  clipReveal?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
-  const baseStyle = {
-    opacity: inView ? 1 : 0,
-    transform: inView ? "translateY(0)" : "translateY(24px)",
-    transition: `opacity 0.6s ease ${delay}s, transform 0.6s ease ${delay}s, clip-path 0.8s cubic-bezier(0.25, 0.1, 0.25, 1) ${delay}s`,
-    ...(clipReveal
-      ? {
-          clipPath: inView ? "inset(0 0% 0 0)" : "inset(0 100% 0 0)",
-        }
-      : {}),
-  };
-
   return (
-    <div ref={ref} className={className} style={baseStyle}>
+    <div
+      ref={ref}
+      className={className}
+      style={{
+        opacity: inView ? 1 : 0,
+        transform: inView ? "translateY(0)" : "translateY(24px)",
+        transition: `opacity 0.6s ease ${delay}s, transform 0.6s ease ${delay}s`,
+      }}
+    >
       {children}
     </div>
   );
@@ -280,7 +275,7 @@ export default function HomeContent() {
       <section className="bg-background py-14 md:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center gap-10 md:gap-16">
-            <FadeIn className="w-full md:w-[45%] flex-shrink-0" clipReveal>
+            <FadeIn className="w-full md:w-[45%] flex-shrink-0">
               <div className="relative aspect-[5/7] rounded-2xl overflow-hidden shadow-xl max-w-md mx-auto md:mx-0">
                 <Image
                   src="/images/client/revive/chad-headshot.jpg"
