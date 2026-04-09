@@ -100,7 +100,7 @@ export const services: Service[] = [
     shortTitle: "Semaglutide",
     description:
       "Achieve sustainable weight loss with our medically supervised semaglutide program. This FDA-recognized GLP-1 therapy helps reduce appetite, regulate blood sugar, and support meaningful, long-term weight management.",
-    image: "/images/client/revive/service-semaglutide.jpg",
+    image: "/images/services/semaglutide-weight-loss.png",
     icon: "⚖️",
     symptoms: [
       "Difficulty losing weight despite diet and exercise",
@@ -171,7 +171,7 @@ export const services: Service[] = [
     shortTitle: "BHRT",
     description:
       "Balance your hormones naturally with bioidentical hormone replacement therapy. BHRT uses plant-derived hormones that are molecularly identical to those your body produces, offering a more natural approach to hormone optimization.",
-    image: "/images/client/revive/service-bhrt.jpg",
+    image: "/images/services/hormone-therapy.png",
     icon: "🧬",
     symptoms: [
       "Hot flashes and night sweats",
@@ -242,7 +242,7 @@ export const services: Service[] = [
     shortTitle: "IV Therapy",
     description:
       "Replenish your body at the cellular level with customized IV nutrient infusions. Our IV therapy delivers vitamins, minerals, and amino acids directly into your bloodstream for maximum absorption and rapid results.",
-    image: "/images/client/revive/service-iv-therapy.jpg",
+    image: "/images/services/iv-therapy.png",
     icon: "💧",
     symptoms: [
       "Chronic fatigue and low energy",

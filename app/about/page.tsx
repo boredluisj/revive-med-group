@@ -123,7 +123,7 @@ export default function AboutPage() {
       <section className="relative py-14 md:py-24 bg-dark-slate overflow-hidden">
         <div className="absolute inset-0 opacity-20">
           <Image
-            src="/images/client/revive/hero-bg.jpg"
+            src="/images/about/about-bg.png"
             alt=""
             fill
             className="object-cover"
@@ -258,6 +258,44 @@ export default function AboutPage() {
                 <p className="text-sm text-primary/70 leading-relaxed">{item.description}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Meet the Team */}
+      <section className="py-14 md:py-24 bg-background">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <h2 className="font-heading text-3xl md:text-4xl font-semibold text-dark-slate text-center mb-4">
+            Meet the Team
+          </h2>
+          <p className="max-w-2xl mx-auto text-center text-primary/70 mb-12">
+            Multiple patients mention Alison by name in their reviews. She is an integral part of the Revive Medical Group experience.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-2xl mx-auto">
+            <div className="bg-white rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-shadow">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 text-primary mb-4">
+                <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                </svg>
+              </div>
+              <h3 className="font-heading text-xl font-semibold text-dark-slate mb-1">Chad Watts</h3>
+              <p className="text-sm font-medium text-primary mb-2">DMSc, PA-C, Owner/Medical Director</p>
+              <p className="text-sm text-primary/60 leading-relaxed">
+                Doctor of Medical Science, Army veteran, board-certified in regenerative medicine. 15+ years of clinical experience.
+              </p>
+            </div>
+            <div className="bg-white rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-shadow">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 text-primary mb-4">
+                <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                </svg>
+              </div>
+              <h3 className="font-heading text-xl font-semibold text-dark-slate mb-1">Alison Watts</h3>
+              <p className="text-sm font-medium text-primary mb-2">RN, Clinical Support</p>
+              <p className="text-sm text-primary/60 leading-relaxed">
+                Registered nurse and integral part of the Revive team. Patients consistently praise Alison for her warmth, attentiveness, and ensuring every patient receives the right treatment.
+              </p>
+            </div>
           </div>
         </div>
       </section>
