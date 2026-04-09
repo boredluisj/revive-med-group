@@ -86,6 +86,7 @@ export default function Header() {
               alt="Revive Medical Group"
               width={200}
               height={28}
+              className="w-[150px] sm:w-[200px] h-auto"
               priority
             />
           </Link>
