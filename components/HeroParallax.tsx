@@ -56,8 +56,8 @@ export default function HeroParallax() {
       {/* Content */}
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14 md:py-24 flex items-center min-h-[90vh] md:min-h-screen">
         <div className="flex flex-col md:flex-row items-center gap-10 md:gap-16 w-full">
-          {/* Chad's headshot */}
-          <div className="w-full md:w-[40%] flex-shrink-0" style={{ opacity: 1 }}>
+          {/* Chad's headshot - hidden on mobile */}
+          <div className="hidden md:block w-full md:w-[40%] flex-shrink-0" style={{ opacity: 1 }}>
             <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl max-w-sm mx-auto">
               <Image
                 src="/images/client/revive/chad-headshot.jpg"
