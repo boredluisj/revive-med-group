@@ -55,12 +55,11 @@ function FadeIn({
     <div
       ref={ref}
       className={className}
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0px)" : "translateY(22px)",
-        transition: `opacity 0.65s ${EASE} ${delay}s, transform 0.65s ${EASE} ${delay}s`,
-        willChange: "opacity, transform",
-      }}
+      style={
+        visible
+          ? { animation: `fadeUp 0.65s ${EASE} ${delay}s both` }
+          : { opacity: 0 }
+      }
     >
       {children}
     </div>
@@ -111,12 +110,11 @@ function StaggerRow({
         ? children.map((child, i) => (
             <div
               key={i}
-              style={{
-                opacity: visible ? 1 : 0,
-                transform: visible ? "translateY(0px)" : "translateY(22px)",
-                transition: `opacity 0.6s ${EASE} ${baseDelay + i * stagger}s, transform 0.6s ${EASE} ${baseDelay + i * stagger}s`,
-                willChange: "opacity, transform",
-              }}
+              style={
+                visible
+                  ? { animation: `fadeUp 0.6s ${EASE} ${baseDelay + i * stagger}s both` }
+                  : { opacity: 0 }
+              }
             >
               {child}
             </div>

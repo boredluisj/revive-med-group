@@ -83,12 +83,11 @@ export default function StatsCounter({ stats }: StatsCounterProps) {
         <div
           key={index}
           className="text-center"
-          style={{
-            opacity: visible ? 1 : 0,
-            transform: visible ? "translateY(0px)" : "translateY(22px)",
-            transition: `opacity 0.65s ${EASE} ${index * 0.12}s, transform 0.65s ${EASE} ${index * 0.12}s`,
-            willChange: "opacity, transform",
-          }}
+          style={
+            visible
+              ? { animation: `fadeUp 0.65s ${EASE} ${index * 0.12}s both` }
+              : { opacity: 0 }
+          }
         >
           <p className="text-5xl font-heading font-bold text-dark-slate mb-2">
             <CountUp target={stat.number} suffix={stat.suffix || ""} inView={visible} />
