@@ -14,20 +14,26 @@ interface StatsCounterProps {
 }
 
 function CountUp({ target, suffix = "", inView }: { target: number; suffix: string; inView: boolean }) {
-  const [count, setCount] = useState(0);
+  // Initialize at target value so it never shows 0
+  const [count, setCount] = useState(target);
+  const hasAnimated = useRef(false);
 
   useEffect(() => {
-    if (!inView) return;
+    if (!inView || hasAnimated.current) return;
+    hasAnimated.current = true;
 
-    const duration = 2000;
+    // Start from 80% of target and count up to 100%
+    const startValue = Math.round(target * 0.8);
+    setCount(startValue);
+
+    const duration = 1200;
     const startTime = performance.now();
 
     const animate = (currentTime: number) => {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      // Ease out cubic
       const eased = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.round(eased * target));
+      setCount(Math.round(startValue + eased * (target - startValue)));
 
       if (progress < 1) {
         requestAnimationFrame(animate);

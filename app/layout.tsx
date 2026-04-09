@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { playfairDisplay, cormorantGaramond, inter } from "@/lib/fonts";
+import { playfairDisplay, cormorantGaramond, dmSans } from "@/lib/fonts";
 import { localBusinessSchema } from "@/lib/schema";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ScrollProgress from "@/components/ScrollProgress";
 import "@/styles/globals.css";
 
 export const metadata: Metadata = {
@@ -18,12 +19,14 @@ export const metadata: Metadata = {
     siteName: "Revive Medical Group",
     locale: "en_US",
     type: "website",
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Revive Medical Group | Hormone Therapy & Regenerative Medicine",
     description:
       "Expert hormone therapy and regenerative medicine in North Myrtle Beach, SC.",
+    images: ["/og-image.jpg"],
   },
 };
 
@@ -35,7 +38,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${playfairDisplay.variable} ${cormorantGaramond.variable} ${inter.variable}`}
+      className={`${playfairDisplay.variable} ${cormorantGaramond.variable} ${dmSans.variable}`}
     >
       <head>
         <script
@@ -46,6 +49,7 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <ScrollProgress />
         <a href="#main" className="skip-link">
           Skip to main content
         </a>

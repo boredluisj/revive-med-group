@@ -220,9 +220,7 @@ export default function PricingPage() {
 
                 <div className="mt-auto">
                   <a
-                    href="https://www.revivemedgroup.com/appointment"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    href="/contact"
                     className={`block w-full text-center py-3 px-6 text-sm font-medium rounded-full transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                       tier.highlight
                         ? "text-white bg-linear-to-r from-primary to-dark-slate hover:opacity-90"
@@ -306,9 +304,7 @@ export default function PricingPage() {
             Book your initial consultation today and take the first step toward feeling like yourself again.
           </p>
           <a
-            href="https://www.revivemedgroup.com/appointment"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/contact"
             className="inline-flex items-center px-8 py-4 text-base font-medium text-white bg-linear-to-r from-primary to-dark-slate rounded-full hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             Book a Consultation

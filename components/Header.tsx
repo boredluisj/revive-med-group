@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 const services = [
   { name: "Testosterone Replacement Therapy (TRT)", slug: "testosterone-replacement-therapy" },
@@ -78,9 +79,15 @@ export default function Header() {
           {/* Logo */}
           <Link
             href="/"
-            className="font-heading text-xl font-semibold text-primary tracking-wide focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
+            className="focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
           >
-            REVIVE MEDICAL
+            <Image
+              src="/logo.svg"
+              alt="Revive Medical Group"
+              width={200}
+              height={28}
+              priority
+            />
           </Link>
 
           {/* Desktop nav */}
@@ -146,9 +153,7 @@ export default function Header() {
 
             {/* CTA */}
             <a
-              href="https://www.revivemedgroup.com/appointment"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/contact"
               className="ml-3 inline-flex items-center px-5 py-2 text-sm font-medium text-white bg-linear-to-r from-primary to-dark-slate rounded-full hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             >
               Book Consultation
@@ -250,9 +255,7 @@ export default function Header() {
               Call: 843-299-9000
             </a>
             <a
-              href="https://www.revivemedgroup.com/appointment"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/contact"
               className="block text-center px-5 py-3 text-sm font-medium text-white bg-linear-to-r from-primary to-dark-slate rounded-full hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             >
               Book Consultation

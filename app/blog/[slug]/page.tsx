@@ -172,9 +172,7 @@ export default async function BlogPostPage({ params }: PageProps) {
             plan tailored to your needs.
           </p>
           <a
-            href="https://www.revivemedgroup.com/appointment"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/contact"
             className="inline-flex items-center px-8 py-4 text-base font-medium text-dark-slate bg-white rounded-full hover:bg-white/90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-dark-slate"
           >
             Schedule a Consultation

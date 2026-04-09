@@ -17,24 +17,29 @@ function FadeIn({
   children,
   className = "",
   delay = 0,
+  clipReveal = false,
 }: {
   children: React.ReactNode;
   className?: string;
   delay?: number;
+  clipReveal?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
+  const baseStyle = {
+    opacity: inView ? 1 : 0,
+    transform: inView ? "translateY(0)" : "translateY(24px)",
+    transition: `opacity 0.6s ease ${delay}s, transform 0.6s ease ${delay}s, clip-path 0.8s cubic-bezier(0.25, 0.1, 0.25, 1) ${delay}s`,
+    ...(clipReveal
+      ? {
+          clipPath: inView ? "inset(0 0% 0 0)" : "inset(0 100% 0 0)",
+        }
+      : {}),
+  };
+
   return (
-    <div
-      ref={ref}
-      className={className}
-      style={{
-        opacity: inView ? 1 : 0,
-        transform: inView ? "translateY(0)" : "translateY(24px)",
-        transition: `opacity 0.6s ease ${delay}s, transform 0.6s ease ${delay}s`,
-      }}
-    >
+    <div ref={ref} className={className} style={baseStyle}>
       {children}
     </div>
   );
@@ -76,10 +81,10 @@ const faqItems = [
 
 /* ── Stats data ──────────────────────────────────────────── */
 const statsData = [
-  { number: 500, suffix: "+", label: "Patients Treated" },
+  { number: 5000, suffix: "+", label: "Patients Treated" },
   { number: 15, suffix: "+", label: "Years Clinical Experience" },
   { number: 4, suffix: "", label: "Clinic Locations" },
-  { number: 10, suffix: "+", label: "Services Offered" },
+  { number: 12, suffix: "+", label: "Services Offered" },
 ];
 
 /* ── Testimonials data ───────────────────────────────────── */
@@ -219,9 +224,7 @@ export default function HomeContent() {
               You&apos;re Not Alone. Let&apos;s Fix This.
             </p>
             <a
-              href="https://www.revivemedgroup.com/appointment"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/contact"
               className="inline-flex items-center px-8 py-4 text-base font-medium text-dark-slate bg-secondary rounded-full hover:opacity-90 transition-opacity shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"
             >
               Book a Free Consultation
@@ -277,7 +280,7 @@ export default function HomeContent() {
       <section className="bg-background py-14 md:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center gap-10 md:gap-16">
-            <FadeIn className="w-full md:w-[45%] flex-shrink-0">
+            <FadeIn className="w-full md:w-[45%] flex-shrink-0" clipReveal>
               <div className="relative aspect-[5/7] rounded-2xl overflow-hidden shadow-xl max-w-md mx-auto md:mx-0">
                 <Image
                   src="/images/client/revive/chad-headshot.jpg"
@@ -415,9 +418,7 @@ export default function HomeContent() {
               your consultation today and discover what personalized care can do.
             </p>
             <a
-              href="https://www.revivemedgroup.com/appointment"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/contact"
               className="inline-flex items-center px-10 py-4 text-base font-medium text-dark-slate bg-secondary rounded-full hover:opacity-90 transition-opacity shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"
             >
               Book Now

@@ -200,9 +200,7 @@ export default function LocationsPage() {
               completed at a local facility, and medications ship directly to your door.
             </p>
             <a
-              href="https://www.revivemedgroup.com/appointment"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/contact"
               className="inline-flex items-center px-8 py-4 text-base font-medium text-white bg-linear-to-r from-primary to-dark-slate rounded-full hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             >
               Schedule a Telehealth Visit

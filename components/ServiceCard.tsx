@@ -7,11 +7,12 @@ interface ServiceCardProps {
   image: string;
   slug: string;
   icon?: React.ReactNode;
+  ctaText?: string;
 }
 
-export default function ServiceCard({ title, description, image, slug, icon }: ServiceCardProps) {
+export default function ServiceCard({ title, description, image, slug, icon, ctaText }: ServiceCardProps) {
   return (
-    <article className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300">
+    <article className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300">
       <div className="relative aspect-[3/2] overflow-hidden">
         <Image
           src={image}
@@ -30,7 +31,7 @@ export default function ServiceCard({ title, description, image, slug, icon }: S
           href={`/services/${slug}`}
           className="inline-flex items-center text-sm font-medium text-primary hover:text-dark-slate transition-colors group/link focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
         >
-          Learn More
+          {ctaText || `Explore ${title}`}
           <svg
             className="ml-1 w-4 h-4 group-hover/link:translate-x-1 transition-transform"
             fill="none"

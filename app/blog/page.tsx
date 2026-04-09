@@ -89,9 +89,7 @@ export default function BlogPage() {
             symptoms, run the right labs, and give you a clear path forward.
           </p>
           <a
-            href="https://www.revivemedgroup.com/appointment"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/contact"
             className="inline-flex items-center px-8 py-4 text-base font-medium text-white bg-linear-to-r from-primary to-dark-slate rounded-full hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             Book a Consultation

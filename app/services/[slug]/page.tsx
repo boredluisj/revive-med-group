@@ -401,9 +401,7 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
                   Book a consultation for {service.shortTitle} today.
                 </p>
                 <a
-                  href="https://www.revivemedgroup.com/appointment"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="/contact"
                   className="inline-flex items-center px-6 py-3 text-sm font-medium text-dark-slate bg-secondary rounded-full hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-dark-slate"
                 >
                   Book a Consultation
@@ -425,9 +423,7 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
             personalized treatment plan built around your goals.
           </p>
           <a
-            href="https://www.revivemedgroup.com/appointment"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/contact"
             className="inline-flex items-center px-8 py-4 text-base font-medium text-dark-slate bg-secondary rounded-full hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-dark-slate"
           >
             Book a Consultation
