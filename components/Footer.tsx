@@ -9,19 +9,18 @@ const quickLinks = [
 ];
 
 const serviceLinks = [
-  { name: "TRT", href: "/services/trt" },
+  { name: "TRT", href: "/services/testosterone-replacement-therapy" },
   { name: "Semaglutide", href: "/services/semaglutide-weight-loss" },
   { name: "BHRT", href: "/services/bhrt" },
   { name: "IV Therapy", href: "/services/iv-nutrient-therapy" },
-  { name: "Sexual Dysfunction", href: "/services/sexual-dysfunction" },
-  { name: "Botox", href: "/services/botox-aesthetics" },
+  { name: "Sexual Dysfunction", href: "/services/sexual-dysfunction-therapy" },
+  { name: "Botox", href: "/services/botox" },
 ];
 
 const resourceLinks = [
   { name: "Blog", href: "/blog" },
-  { name: "FAQ", href: "/faq" },
-  { name: "HIPAA Notice", href: "/hipaa" },
-  { name: "Privacy Policy", href: "/privacy" },
+  { name: "HIPAA Notice", href: "/hipaa-notice" },
+  { name: "Privacy Policy", href: "/privacy-policy" },
   { name: "Terms", href: "/terms" },
 ];
 

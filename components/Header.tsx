@@ -4,17 +4,17 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 
 const services = [
-  { name: "Testosterone Replacement Therapy (TRT)", slug: "trt" },
+  { name: "Testosterone Replacement Therapy (TRT)", slug: "testosterone-replacement-therapy" },
   { name: "Semaglutide Weight Loss", slug: "semaglutide-weight-loss" },
   { name: "Bioidentical Hormone Therapy (BHRT)", slug: "bhrt" },
   { name: "IV Nutrient Therapy", slug: "iv-nutrient-therapy" },
-  { name: "Sexual Dysfunction", slug: "sexual-dysfunction" },
-  { name: "Botox & Aesthetics", slug: "botox-aesthetics" },
-  { name: "Peptide Therapy", slug: "peptide-therapy" },
-  { name: "Thyroid Optimization", slug: "thyroid-optimization" },
-  { name: "Regenerative Medicine", slug: "regenerative-medicine" },
-  { name: "Functional Lab Testing", slug: "functional-lab-testing" },
-  { name: "Telehealth Consultations", slug: "telehealth" },
+  { name: "Sexual Dysfunction", slug: "sexual-dysfunction-therapy" },
+  { name: "Botox & Aesthetics", slug: "botox" },
+  { name: "Peptide Therapy", slug: "peptide-treatment" },
+  { name: "Growth Hormone Therapy", slug: "growth-hormone-deficiency" },
+  { name: "Dermal Fillers", slug: "dermal-filler" },
+  { name: "Hair Restoration", slug: "hair-restoration" },
+  { name: "Hormonal Imbalance Therapy", slug: "hormonal-imbalance-therapy" },
 ];
 
 const navLinks = [

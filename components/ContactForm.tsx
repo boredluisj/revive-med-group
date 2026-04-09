@@ -186,8 +186,8 @@ export default function ContactForm() {
         />
         <label htmlFor="contact-hipaa" className="text-sm text-primary/70 leading-snug">
           I understand and accept the{" "}
-          <a href="/privacy" className="underline hover:text-dark-slate">Privacy Policy</a> and{" "}
-          <a href="/hipaa" className="underline hover:text-dark-slate">HIPAA Notice</a>{" "}
+          <a href="/privacy-policy" className="underline hover:text-dark-slate">Privacy Policy</a> and{" "}
+          <a href="/hipaa-notice" className="underline hover:text-dark-slate">HIPAA Notice</a>{" "}
           <span className="text-red-500">*</span>
         </label>
       </div>
