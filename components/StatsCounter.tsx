@@ -1,8 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
-import { motion, useInView, useReducedMotion } from "framer-motion";
-import { EASE, staggerContainer, staggerItem } from "@/lib/animations";
+import { useInView } from "framer-motion";
 
 interface Stat {
   number: number;
@@ -13,6 +12,8 @@ interface Stat {
 interface StatsCounterProps {
   stats: Stat[];
 }
+
+const EASE = "cubic-bezier(0.25, 0.46, 0.45, 0.94)";
 
 function CountUp({ target, suffix = "", inView }: { target: number; suffix: string; inView: boolean }) {
   const [count, setCount] = useState(target);
@@ -52,29 +53,36 @@ function CountUp({ target, suffix = "", inView }: { target: number; suffix: stri
 
 export default function StatsCounter({ stats }: StatsCounterProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-60px" });
-  const prefersReducedMotion = useReducedMotion();
+  const isInView = useInView(ref, { once: true, amount: 0.15 });
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    requestAnimationFrame(() => setMounted(true));
+  }, []);
+
+  const active = mounted && isInView;
 
   return (
-    <motion.div
-      ref={ref}
-      className="grid grid-cols-2 lg:grid-cols-4 gap-8"
-      variants={prefersReducedMotion ? undefined : staggerContainer}
-      initial="hidden"
-      animate={isInView ? "visible" : "hidden"}
-    >
+    <div ref={ref} className="grid grid-cols-2 lg:grid-cols-4 gap-8">
       {stats.map((stat, index) => (
-        <motion.div
+        <div
           key={index}
-          className="text-center opacity-100"
-          variants={prefersReducedMotion ? undefined : staggerItem}
+          className="text-center"
+          style={{
+            opacity: active ? 1 : 0,
+            transform: active ? "translateY(0px)" : "translateY(22px)",
+            transition: mounted
+              ? `opacity 0.65s ${EASE} ${index * 0.12}s, transform 0.65s ${EASE} ${index * 0.12}s`
+              : "none",
+            willChange: "opacity, transform",
+          }}
         >
           <p className="text-5xl font-heading font-bold text-dark-slate mb-2">
             <CountUp target={stat.number} suffix={stat.suffix || ""} inView={isInView} />
           </p>
           <p className="text-base text-primary/70">{stat.label}</p>
-        </motion.div>
+        </div>
       ))}
-    </motion.div>
+    </div>
   );
 }

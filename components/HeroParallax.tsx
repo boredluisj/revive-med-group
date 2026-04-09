@@ -1,29 +1,35 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import { motion, useReducedMotion } from "framer-motion";
-import { EASE, wordStagger, wordItem, fadeUp, fadeIn } from "@/lib/animations";
+import { useReducedMotion } from "framer-motion";
 
 const HEADLINE = "Experience the Revive Difference";
+const WORDS = HEADLINE.split(" ");
+
+const EASE = "cubic-bezier(0.25, 0.46, 0.45, 0.94)";
+
+function transition(delay: number, duration = 0.75) {
+  return `opacity ${duration}s ${EASE} ${delay}s, transform ${duration}s ${EASE} ${delay}s`;
+}
+
+function fadeStyle(active: boolean, delay: number, reduced: boolean, duration = 0.75) {
+  if (reduced) return {};
+  return {
+    opacity: active ? 1 : 0,
+    transform: active ? "translateY(0px)" : "translateY(28px)",
+    transition: active ? transition(delay, duration) : "none",
+    willChange: "opacity, transform",
+  };
+}
 
 export default function HeroParallax() {
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotion = useReducedMotion() ?? false;
+  const [mounted, setMounted] = useState(false);
 
-  const containerVariants = {
-    hidden: {},
-    visible: {
-      transition: { staggerChildren: 0.18, delayChildren: 0.05 },
-    },
-  };
-
-  const blockVariant = (delay = 0) => ({
-    hidden: prefersReducedMotion ? {} : { opacity: 0, y: 28 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.75, ease: EASE, delay },
-    },
-  });
+  useEffect(() => {
+    requestAnimationFrame(() => setMounted(true));
+  }, []);
 
   return (
     <section className="relative min-h-[90vh] md:min-h-screen overflow-hidden">
@@ -38,11 +44,16 @@ export default function HeroParallax() {
       />
 
       {/* Overlay */}
-      <motion.div
+      <div
         className="absolute inset-0 bg-linear-to-r from-black/55 via-black/35 to-transparent"
-        initial={prefersReducedMotion ? {} : { opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.0, ease: "easeOut" }}
+        style={
+          prefersReducedMotion
+            ? {}
+            : {
+                opacity: mounted ? 1 : 0,
+                transition: mounted ? `opacity 1.0s ease-out 0s` : "none",
+              }
+        }
       />
 
       {/* Content */}
@@ -50,11 +61,9 @@ export default function HeroParallax() {
         <div className="flex flex-col md:flex-row items-center gap-10 md:gap-16 w-full">
 
           {/* Chad headshot — desktop only */}
-          <motion.div
+          <div
             className="hidden md:block w-full md:w-[40%] flex-shrink-0"
-            variants={blockVariant(0.1)}
-            initial="hidden"
-            animate="visible"
+            style={fadeStyle(mounted, 0.1, prefersReducedMotion)}
           >
             <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl max-w-sm mx-auto">
               <Image
@@ -66,46 +75,51 @@ export default function HeroParallax() {
                 priority
               />
             </div>
-          </motion.div>
+          </div>
 
           {/* Text content */}
           <div className="flex-1 text-center md:text-left">
 
             {/* Word-by-word H1 */}
-            <motion.h1
+            <h1
               className="font-heading text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-6 leading-tight drop-shadow-lg"
-              variants={prefersReducedMotion ? undefined : wordStagger}
-              initial="hidden"
-              animate="visible"
               aria-label={HEADLINE}
             >
-              {HEADLINE.split(" ").map((word, i) => (
-                <motion.span
+              {WORDS.map((word, i) => (
+                <span
                   key={i}
-                  variants={prefersReducedMotion ? undefined : wordItem}
                   className="inline-block mr-[0.25em]"
+                  style={
+                    prefersReducedMotion
+                      ? {}
+                      : {
+                          opacity: mounted ? 1 : 0,
+                          transform: mounted ? "translateY(0px)" : "translateY(20px)",
+                          filter: mounted ? "blur(0px)" : "blur(4px)",
+                          transition: mounted
+                            ? `opacity 0.65s ${EASE} ${0.15 + i * 0.09}s, transform 0.65s ${EASE} ${0.15 + i * 0.09}s, filter 0.65s ${EASE} ${0.15 + i * 0.09}s`
+                            : "none",
+                          willChange: "opacity, transform, filter",
+                        }
+                  }
                 >
                   {word}
-                </motion.span>
+                </span>
               ))}
-            </motion.h1>
+            </h1>
 
             {/* Subtitle */}
-            <motion.p
+            <p
               className="text-lg sm:text-xl text-white/90 mb-8 max-w-lg leading-relaxed drop-shadow"
-              variants={blockVariant(0.55)}
-              initial="hidden"
-              animate="visible"
+              style={fadeStyle(mounted, 0.65, prefersReducedMotion)}
             >
               Personalized Hormone &amp; Regenerative Medicine for Your Best Self
-            </motion.p>
+            </p>
 
             {/* CTAs */}
-            <motion.div
+            <div
               className="flex flex-col sm:flex-row items-center gap-4"
-              variants={blockVariant(0.7)}
-              initial="hidden"
-              animate="visible"
+              style={fadeStyle(mounted, 0.8, prefersReducedMotion)}
             >
               <a
                 href="/contact"
@@ -122,14 +136,12 @@ export default function HeroParallax() {
                 </svg>
                 843-299-9000
               </a>
-            </motion.div>
+            </div>
 
             {/* Google Reviews badge */}
-            <motion.div
+            <div
               className="mt-8 flex items-center gap-3 justify-center md:justify-start"
-              variants={blockVariant(0.85)}
-              initial="hidden"
-              animate="visible"
+              style={fadeStyle(mounted, 0.95, prefersReducedMotion)}
             >
               <div className="flex items-center gap-1">
                 {[...Array(5)].map((_, i) => (
@@ -139,7 +151,7 @@ export default function HeroParallax() {
                 ))}
               </div>
               <span className="text-white/80 text-sm font-medium">4.9/5 from 75 Google Reviews</span>
-            </motion.div>
+            </div>
           </div>
         </div>
       </div>

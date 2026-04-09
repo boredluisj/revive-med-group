@@ -1,10 +1,9 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useInView, useReducedMotion } from "framer-motion";
-import { EASE, fadeUp, staggerContainer, staggerItem, slideInLeft, slideInRight } from "@/lib/animations";
+import { useInView } from "framer-motion";
 import HeroParallax from "@/components/HeroParallax";
 import StatsCounter from "@/components/StatsCounter";
 import ServiceCard from "@/components/ServiceCard";
@@ -13,7 +12,9 @@ import HowItWorks from "@/components/HowItWorks";
 import Accordion from "@/components/Accordion";
 import { services } from "@/lib/services";
 
-/* ── Scroll-triggered fade-up wrapper ──────────────────────── */
+const EASE = "cubic-bezier(0.25, 0.46, 0.45, 0.94)";
+
+/* ── Reliable fade-up wrapper (CSS transitions, not framer-motion animate) ── */
 function FadeIn({
   children,
   className = "",
@@ -24,64 +25,75 @@ function FadeIn({
   delay?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-80px" });
-  const prefersReducedMotion = useReducedMotion();
+  const isInView = useInView(ref, { once: true, amount: 0.15 });
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    requestAnimationFrame(() => setMounted(true));
+  }, []);
+
+  const active = mounted && isInView;
 
   return (
-    <motion.div
-      ref={ref}
-      className={`${className} opacity-100`}
-      initial={prefersReducedMotion ? {} : { opacity: 0, y: 28 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.7, ease: EASE, delay }}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-/* ── Stagger group wrapper (for grids) ─────────────────────── */
-function StaggerGroup({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-60px" });
-  const prefersReducedMotion = useReducedMotion();
-
-  return (
-    <motion.div
+    <div
       ref={ref}
       className={className}
-      variants={prefersReducedMotion ? undefined : staggerContainer}
-      initial="hidden"
-      animate={isInView ? "visible" : "hidden"}
+      style={{
+        opacity: active ? 1 : 0,
+        transform: active ? "translateY(0px)" : "translateY(22px)",
+        transition: mounted
+          ? `opacity 0.65s ${EASE} ${delay}s, transform 0.65s ${EASE} ${delay}s`
+          : "none",
+        willChange: "opacity, transform",
+      }}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }
 
-/* ── Stagger item (child of StaggerGroup) ──────────────────── */
-function StaggerItem({
+/* ── Stagger row — children cascade in via nth-child delay ── */
+function StaggerRow({
   children,
   className = "",
+  baseDelay = 0,
+  stagger = 0.1,
 }: {
   children: React.ReactNode;
   className?: string;
+  baseDelay?: number;
+  stagger?: number;
 }) {
-  const prefersReducedMotion = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, amount: 0.1 });
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    requestAnimationFrame(() => setMounted(true));
+  }, []);
+
+  const active = mounted && isInView;
 
   return (
-    <motion.div
-      className={`${className} opacity-100`}
-      variants={prefersReducedMotion ? undefined : staggerItem}
-    >
-      {children}
-    </motion.div>
+    <div ref={ref} className={className}>
+      {Array.isArray(children)
+        ? children.map((child, i) => (
+            <div
+              key={i}
+              style={{
+                opacity: active ? 1 : 0,
+                transform: active ? "translateY(0px)" : "translateY(22px)",
+                transition: mounted
+                  ? `opacity 0.6s ${EASE} ${baseDelay + i * stagger}s, transform 0.6s ${EASE} ${baseDelay + i * stagger}s`
+                  : "none",
+                willChange: "opacity, transform",
+              }}
+            >
+              {child}
+            </div>
+          ))
+        : children}
+    </div>
   );
 }
 
@@ -127,7 +139,7 @@ const statsData = [
   { number: 12, suffix: "+", label: "Services Offered" },
 ];
 
-/* ── Testimonials data ───────────────────────────────────────── */
+/* ── Testimonials ────────────────────────────────────────────── */
 const testimonials = [
   {
     author: "Eduardo Andres",
@@ -149,35 +161,15 @@ const testimonials = [
   },
 ];
 
-/* ── Credentials data ────────────────────────────────────────── */
+/* ── Credentials ─────────────────────────────────────────────── */
 const credentials = [
-  {
-    icon: "🎓",
-    label: "DMSc Degree",
-    description:
-      "Doctor of Medical Science, the highest clinical doctorate for physician assistants.",
-  },
-  {
-    icon: "🏅",
-    label: "AABRM + ABRM Certifications",
-    description:
-      "Board-certified in regenerative and anti-aging medicine through two leading organizations.",
-  },
-  {
-    icon: "🩺",
-    label: "PA-C License",
-    description:
-      "Nationally certified Physician Assistant with full prescriptive authority.",
-  },
-  {
-    icon: "🎖️",
-    label: "Military Service",
-    description:
-      "Proudly served in the U.S. military, bringing discipline and dedication to patient care.",
-  },
+  { icon: "🎓", label: "DMSc Degree", description: "Doctor of Medical Science, the highest clinical doctorate for physician assistants." },
+  { icon: "🏅", label: "AABRM + ABRM Certifications", description: "Board-certified in regenerative and anti-aging medicine through two leading organizations." },
+  { icon: "🩺", label: "PA-C License", description: "Nationally certified Physician Assistant with full prescriptive authority." },
+  { icon: "🎖️", label: "Military Service", description: "Proudly served in the U.S. military, bringing discipline and dedication to patient care." },
 ];
 
-/* ── Symptoms data ───────────────────────────────────────────── */
+/* ── Symptoms ────────────────────────────────────────────────── */
 const symptoms = [
   "Constant fatigue no matter how much you sleep",
   "Sexual dysfunction or low libido",
@@ -187,7 +179,7 @@ const symptoms = [
   "Mood swings, irritability, or anxiety",
 ];
 
-/* ── Page Content ────────────────────────────────────────────── */
+/* ── Page ────────────────────────────────────────────────────── */
 export default function HomeContent() {
   return (
     <>
@@ -206,24 +198,19 @@ export default function HomeContent() {
             </p>
           </FadeIn>
 
-          <StaggerGroup className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <StaggerRow className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8" stagger={0.1}>
             {credentials.map((cred) => (
-              <StaggerItem key={cred.label} className="text-center">
+              <div key={cred.label} className="text-center">
                 <div className="text-4xl mb-3">{cred.icon}</div>
-                <h3 className="font-heading text-lg font-semibold text-dark-slate mb-1">
-                  {cred.label}
-                </h3>
-                <p className="text-sm text-primary/70 leading-relaxed">
-                  {cred.description}
-                </p>
-              </StaggerItem>
+                <h3 className="font-heading text-lg font-semibold text-dark-slate mb-1">{cred.label}</h3>
+                <p className="text-sm text-primary/70 leading-relaxed">{cred.description}</p>
+              </div>
             ))}
-          </StaggerGroup>
+          </StaggerRow>
 
           <FadeIn delay={0.2} className="text-center mt-10">
             <p className="text-sm text-primary/60 max-w-xl mx-auto">
-              Chad combines advanced education, military-grade discipline, and a
-              genuine passion for helping patients reclaim their health.
+              Chad combines advanced education, military-grade discipline, and a genuine passion for helping patients reclaim their health.
             </p>
           </FadeIn>
         </div>
@@ -238,35 +225,22 @@ export default function HomeContent() {
             </h2>
           </FadeIn>
 
-          <StaggerGroup className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
+          <StaggerRow className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto" stagger={0.08}>
             {symptoms.map((symptom, i) => (
-              <StaggerItem key={i} className="flex items-start gap-3">
-                <svg
-                  className="w-6 h-6 text-secondary flex-shrink-0 mt-0.5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2.5}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M5 13l4 4L19 7"
-                  />
+              <div key={i} className="flex items-start gap-3">
+                <svg className="w-6 h-6 text-secondary flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
                 <span className="text-white/90">{symptom}</span>
-              </StaggerItem>
+              </div>
             ))}
-          </StaggerGroup>
+          </StaggerRow>
 
           <FadeIn delay={0.3} className="text-center mt-12">
             <p className="text-xl font-heading font-semibold text-secondary mb-6">
               You&apos;re Not Alone. Let&apos;s Fix This.
             </p>
-            <a
-              href="/contact"
-              className="inline-flex items-center px-8 py-4 text-base font-medium text-dark-slate bg-secondary rounded-full hover:opacity-90 transition-opacity shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"
-            >
+            <a href="/contact" className="inline-flex items-center px-8 py-4 text-base font-medium text-dark-slate bg-secondary rounded-full hover:opacity-90 transition-opacity shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2">
               Book a Free Consultation
             </a>
           </FadeIn>
@@ -277,27 +251,17 @@ export default function HomeContent() {
       <section className="bg-light-warm py-14 md:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <FadeIn className="text-center mb-12">
-            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-dark-slate mb-3">
-              Our Services
-            </h2>
+            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-dark-slate mb-3">Our Services</h2>
             <p className="text-primary/70 max-w-2xl mx-auto">
-              Comprehensive treatments tailored to your body, your goals, and
-              your life.
+              Comprehensive treatments tailored to your body, your goals, and your life.
             </p>
           </FadeIn>
 
-          <StaggerGroup className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <StaggerRow className="grid grid-cols-1 md:grid-cols-2 gap-8" stagger={0.1}>
             {services.map((service) => (
-              <StaggerItem key={service.slug}>
-                <ServiceCard
-                  title={service.title}
-                  description={service.description}
-                  image={service.image}
-                  slug={service.slug}
-                />
-              </StaggerItem>
+              <ServiceCard key={service.slug} title={service.title} description={service.description} image={service.image} slug={service.slug} />
             ))}
-          </StaggerGroup>
+          </StaggerRow>
         </div>
       </section>
 
@@ -305,11 +269,8 @@ export default function HomeContent() {
       <section className="bg-primary py-14 md:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <FadeIn className="text-center mb-12">
-            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-white mb-3">
-              Revive by the Numbers
-            </h2>
+            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-white mb-3">Revive by the Numbers</h2>
           </FadeIn>
-
           <div className="[&_p]:text-white">
             <StatsCounter stats={statsData} />
           </div>
@@ -333,32 +294,17 @@ export default function HomeContent() {
             </FadeIn>
 
             <FadeIn delay={0.15} className="flex-1 text-center md:text-left">
-              <h2 className="font-heading text-3xl sm:text-4xl font-bold text-dark-slate mb-4">
-                Meet Chad Watts, DMSc, PA-C
-              </h2>
+              <h2 className="font-heading text-3xl sm:text-4xl font-bold text-dark-slate mb-4">Meet Chad Watts, DMSc, PA-C</h2>
               <p className="text-primary/80 leading-relaxed mb-4">
-                Chad Watts is a Doctor of Medical Science and board-certified
-                Physician Assistant with over 15 years of clinical experience.
-                Before entering medicine, Chad served in the U.S. military,
-                where he developed the discipline, work ethic, and commitment to
-                service that define his approach to patient care today.
+                Chad Watts is a Doctor of Medical Science and board-certified Physician Assistant with over 15 years of clinical experience. Before entering medicine, Chad served in the U.S. military, where he developed the discipline, work ethic, and commitment to service that define his approach to patient care today.
               </p>
               <p className="text-primary/80 leading-relaxed mb-4">
-                His philosophy is simple: listen first, test thoroughly, and
-                treat the root cause. Chad does not push products or rush
-                through appointments. He takes the time to understand what each
-                patient is going through and builds a plan around their unique
-                biology and goals.
+                His philosophy is simple: listen first, test thoroughly, and treat the root cause. Chad does not push products or rush through appointments. He takes the time to understand what each patient is going through and builds a plan around their unique biology and goals.
               </p>
               <p className="text-primary/80 leading-relaxed mb-6">
-                Whether you are dealing with fatigue, weight gain, hormonal
-                changes, or just not feeling your best, Chad and the Revive team
-                are here to help you take back control.
+                Whether you are dealing with fatigue, weight gain, hormonal changes, or just not feeling your best, Chad and the Revive team are here to help you take back control.
               </p>
-              <Link
-                href="/about"
-                className="inline-flex items-center px-8 py-4 text-base font-medium text-white bg-linear-to-r from-primary to-dark-slate rounded-full hover:opacity-90 transition-opacity shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-              >
+              <Link href="/about" className="inline-flex items-center px-8 py-4 text-base font-medium text-white bg-linear-to-r from-primary to-dark-slate rounded-full hover:opacity-90 transition-opacity shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
                 Full Bio &amp; Story
               </Link>
             </FadeIn>
@@ -370,9 +316,7 @@ export default function HomeContent() {
       <section className="bg-light-warm py-14 md:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <FadeIn className="text-center mb-12">
-            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-dark-slate mb-3">
-              What Our Patients Say
-            </h2>
+            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-dark-slate mb-3">What Our Patients Say</h2>
             <div className="flex items-center justify-center gap-3 mt-4">
               <div className="flex items-center gap-0.5">
                 {[...Array(5)].map((_, i) => (
@@ -381,23 +325,15 @@ export default function HomeContent() {
                   </svg>
                 ))}
               </div>
-              <span className="text-primary/70 font-medium text-sm">
-                4.9 out of 5 based on 75 Google Reviews
-              </span>
+              <span className="text-primary/70 font-medium text-sm">4.9 out of 5 based on 75 Google Reviews</span>
             </div>
           </FadeIn>
 
-          <StaggerGroup className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <StaggerRow className="grid grid-cols-1 md:grid-cols-3 gap-8" stagger={0.1}>
             {testimonials.map((t) => (
-              <StaggerItem key={t.author}>
-                <Testimonial
-                  quote={t.quote}
-                  author={t.author}
-                  rating={t.rating}
-                />
-              </StaggerItem>
+              <Testimonial key={t.author} quote={t.quote} author={t.author} rating={t.rating} />
             ))}
-          </StaggerGroup>
+          </StaggerRow>
 
           <FadeIn delay={0.2} className="mt-8">
             <div className="bg-white rounded-xl p-6 max-w-2xl mx-auto border-l-4 border-primary shadow-sm">
@@ -428,15 +364,9 @@ export default function HomeContent() {
       <section className="bg-background py-14 md:py-24">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <FadeIn className="text-center mb-12">
-            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-dark-slate mb-3">
-              Frequently Asked Questions
-            </h2>
-            <p className="text-primary/70 max-w-2xl mx-auto">
-              Common questions from patients exploring hormone therapy and
-              regenerative medicine.
-            </p>
+            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-dark-slate mb-3">Frequently Asked Questions</h2>
+            <p className="text-primary/70 max-w-2xl mx-auto">Common questions from patients exploring hormone therapy and regenerative medicine.</p>
           </FadeIn>
-
           <FadeIn delay={0.1}>
             <Accordion items={faqItems} />
           </FadeIn>
@@ -447,17 +377,11 @@ export default function HomeContent() {
       <section className="bg-linear-to-r from-primary to-dark-slate py-14 md:py-24">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
           <FadeIn>
-            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-white mb-3">
-              Ready to Revive Your Health?
-            </h2>
+            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-white mb-3">Ready to Revive Your Health?</h2>
             <p className="text-white/80 text-lg mb-8 max-w-xl mx-auto">
-              Take the first step toward feeling like yourself again. Schedule
-              your consultation today and discover what personalized care can do.
+              Take the first step toward feeling like yourself again. Schedule your consultation today and discover what personalized care can do.
             </p>
-            <a
-              href="/contact"
-              className="inline-flex items-center px-10 py-4 text-base font-medium text-dark-slate bg-secondary rounded-full hover:opacity-90 transition-opacity shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"
-            >
+            <a href="/contact" className="inline-flex items-center px-10 py-4 text-base font-medium text-dark-slate bg-secondary rounded-full hover:opacity-90 transition-opacity shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2">
               Book Now
             </a>
           </FadeIn>
