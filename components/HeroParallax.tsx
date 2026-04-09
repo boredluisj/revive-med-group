@@ -1,20 +1,29 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import Image from "next/image";
 
 export default function HeroParallax() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
-  const [scrollY, setScrollY] = useState(0);
+  const photoRef = useRef<HTMLDivElement>(null);
+  const videoElRef = useRef<HTMLVideoElement>(null);
+  const fallbackRef = useRef<HTMLDivElement>(null);
+  const gradientRef = useRef<HTMLDivElement>(null);
+  const rafId = useRef<number>(0);
+  const lastScroll = useRef(0);
+  const targetTime = useRef(0);
+  const currentTime = useRef(0);
+
   const [visibleWords, setVisibleWords] = useState(0);
-  const [isDesktop, setIsDesktop] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   const headline = "Experience the Revive Difference";
   const words = headline.split(" ");
 
   // Word stagger animation on mount
   useEffect(() => {
+    setIsMounted(true);
     let frame: number;
     let current = 0;
 
@@ -40,33 +49,67 @@ export default function HeroParallax() {
     };
   }, [words.length]);
 
-  // Check desktop on mount
-  useEffect(() => {
-    setIsDesktop(window.innerWidth >= 768);
+  // Smooth interpolation loop for video scrubbing
+  // Instead of jumping directly to the target time, we lerp toward it
+  const smoothScrub = useCallback(() => {
+    const video = videoRef.current;
+    if (video && video.duration && !isNaN(video.duration)) {
+      // Lerp: ease toward target (0.08 = smooth, 0.15 = snappier)
+      currentTime.current += (targetTime.current - currentTime.current) * 0.1;
+
+      // Only seek if the difference is meaningful (avoids micro-jitter)
+      if (Math.abs(video.currentTime - currentTime.current) > 0.01) {
+        video.currentTime = currentTime.current;
+      }
+    }
+
+    rafId.current = requestAnimationFrame(smoothScrub);
   }, []);
 
-  // Scroll-scrub video + parallax effect
+  // Scroll handler: reads scroll position and applies parallax via direct DOM manipulation
   useEffect(() => {
-    const video = videoRef.current;
+    const isDesktop = window.innerWidth >= 768;
 
     const handleScroll = () => {
       const y = window.scrollY;
-      setScrollY(y);
+      lastScroll.current = y;
 
-      // Scroll-scrub: map scroll position to video time
-      if (video && video.duration) {
-        const maxScroll = 400;
-        const progress = Math.min(y / maxScroll, 1);
-        video.currentTime = progress * video.duration;
+      const maxScroll = 400;
+      const progress = Math.min(y / maxScroll, 1);
+
+      // Set video target time (the lerp loop will smooth it)
+      const video = videoRef.current;
+      if (video && video.duration && !isNaN(video.duration)) {
+        targetTime.current = progress * video.duration;
+      }
+
+      // Direct DOM updates (no React re-render)
+      if (isDesktop) {
+        if (photoRef.current) {
+          photoRef.current.style.opacity = String(1 - progress);
+        }
+        if (fallbackRef.current) {
+          fallbackRef.current.style.opacity = String(1 - progress);
+        }
+        if (gradientRef.current) {
+          gradientRef.current.style.background = `linear-gradient(135deg,
+            rgba(89, 99, 126, ${0.15 - progress * 0.1}) 0%,
+            rgba(235, 229, 213, ${0.05 + progress * 0.05}) 50%,
+            transparent 100%)`;
+        }
       }
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
-  const parallaxProgress = isDesktop ? Math.min(scrollY / 400, 1) : 0;
-  const photoOpacity = 1 - parallaxProgress;
+    // Start the smooth interpolation loop
+    rafId.current = requestAnimationFrame(smoothScrub);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      cancelAnimationFrame(rafId.current);
+    };
+  }, [smoothScrub]);
 
   return (
     <section
@@ -81,30 +124,31 @@ export default function HeroParallax() {
         playsInline
         preload="auto"
         className="absolute inset-0 w-full h-full object-cover"
-        style={{ opacity: isDesktop ? 1 - parallaxProgress * 0.3 : 1 }}
       />
 
       {/* Static hero image fallback (loads instantly while video buffers) */}
-      <Image
-        src="/images/hero/hero-bg.png"
-        alt="Warm inviting medical clinic reception area with cream walls and soft natural lighting"
-        fill
-        className="object-cover"
-        priority
-        sizes="100vw"
-        style={{ opacity: isDesktop ? 1 - parallaxProgress : 0.7 }}
-      />
+      <div ref={fallbackRef} className="absolute inset-0" style={{ opacity: 0.7 }}>
+        <Image
+          src="/images/hero/hero-bg.png"
+          alt="Warm inviting medical clinic reception area with cream walls and soft natural lighting"
+          fill
+          className="object-cover"
+          priority
+          sizes="100vw"
+        />
+      </div>
 
       {/* Dark overlay for text readability */}
       <div className="absolute inset-0 bg-linear-to-r from-black/50 via-black/30 to-transparent" />
 
-      {/* Mesh gradient overlay */}
+      {/* Mesh gradient overlay (manipulated via ref) */}
       <div
+        ref={gradientRef}
         className="absolute inset-0"
         style={{
           background: `linear-gradient(135deg,
-            rgba(89, 99, 126, ${0.15 - parallaxProgress * 0.1}) 0%,
-            rgba(235, 229, 213, ${0.05 + parallaxProgress * 0.05}) 50%,
+            rgba(89, 99, 126, 0.15) 0%,
+            rgba(235, 229, 213, 0.05) 50%,
             transparent 100%)`,
         }}
       />
@@ -114,8 +158,9 @@ export default function HeroParallax() {
         <div className="flex flex-col md:flex-row items-center gap-10 md:gap-16 w-full">
           {/* Chad's headshot */}
           <div
+            ref={photoRef}
             className="w-full md:w-[40%] flex-shrink-0"
-            style={{ opacity: isDesktop ? photoOpacity : 1 }}
+            style={{ opacity: 1 }}
           >
             <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl max-w-sm mx-auto">
               <Image
@@ -137,8 +182,8 @@ export default function HeroParallax() {
                   key={i}
                   className="inline-block mr-[0.3em] transition-all duration-500"
                   style={{
-                    opacity: i < visibleWords ? 1 : 0,
-                    transform: i < visibleWords ? "translateY(0)" : "translateY(12px)",
+                    opacity: isMounted && i < visibleWords ? 1 : 0,
+                    transform: isMounted && i < visibleWords ? "translateY(0)" : "translateY(12px)",
                   }}
                 >
                   {word}

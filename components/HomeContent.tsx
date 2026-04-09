@@ -280,7 +280,7 @@ export default function HomeContent() {
             <FadeIn className="w-full md:w-[45%] flex-shrink-0">
               <div className="relative aspect-[5/7] rounded-2xl overflow-hidden shadow-xl max-w-md mx-auto md:mx-0">
                 <Image
-                  src="/images/chad-headshot.jpg"
+                  src="/images/client/revive/chad-headshot.jpg"
                   alt="Chad Watts, DMSc, PA-C, founder of Revive Medical Group"
                   fill
                   sizes="(max-width: 768px) 100vw, 45vw"
