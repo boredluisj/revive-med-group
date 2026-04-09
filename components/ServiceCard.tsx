@@ -12,7 +12,7 @@ interface ServiceCardProps {
 
 export default function ServiceCard({ title, description, image, slug, icon, ctaText }: ServiceCardProps) {
   return (
-    <article className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300">
+    <article className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300">
       <div className="relative aspect-[3/2] overflow-hidden">
         <Image
           src={image}

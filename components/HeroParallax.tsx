@@ -1,46 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 export default function HeroParallax() {
-  const [visibleWords, setVisibleWords] = useState(0);
-  const [isMounted, setIsMounted] = useState(false);
+  const [show, setShow] = useState(false);
+  const heroRef = useRef<HTMLElement>(null);
 
-  const headline = "Experience the Revive Difference";
-  const words = headline.split(" ");
-
-  // Word stagger animation on mount
   useEffect(() => {
-    setIsMounted(true);
-    let frame: number;
-    let current = 0;
-
-    const reveal = () => {
-      current++;
-      setVisibleWords(current);
-      if (current < words.length) {
-        frame = requestAnimationFrame(() => {
-          setTimeout(() => {
-            frame = requestAnimationFrame(reveal);
-          }, 180);
-        });
-      }
-    };
-
-    const timeout = setTimeout(() => {
-      frame = requestAnimationFrame(reveal);
-    }, 300);
-
-    return () => {
-      clearTimeout(timeout);
-      cancelAnimationFrame(frame);
-    };
-  }, [words.length]);
+    // Single smooth fade-in for all hero content
+    const timer = setTimeout(() => setShow(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
-    <section className="relative min-h-[90vh] md:min-h-screen overflow-hidden">
-      {/* Static hero background - first frame of the video exported as image */}
+    <section ref={heroRef} className="relative min-h-[90vh] md:min-h-screen overflow-hidden">
+      {/* Static hero background */}
       <Image
         src="/images/hero/hero-bg.png"
         alt="Warm inviting medical clinic reception area with cream walls and soft natural lighting"
@@ -57,7 +32,14 @@ export default function HeroParallax() {
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14 md:py-24 flex items-center min-h-[90vh] md:min-h-screen">
         <div className="flex flex-col md:flex-row items-center gap-10 md:gap-16 w-full">
           {/* Chad's headshot - hidden on mobile */}
-          <div className="hidden md:block w-full md:w-[40%] flex-shrink-0" style={{ opacity: 1 }}>
+          <div
+            className="hidden md:block w-full md:w-[40%] flex-shrink-0"
+            style={{
+              opacity: show ? 1 : 0,
+              transform: show ? "translateY(0)" : "translateY(20px)",
+              transition: "opacity 0.8s ease, transform 0.8s ease",
+            }}
+          >
             <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl max-w-sm mx-auto">
               <Image
                 src="/images/client/revive/chad-headshot.jpg"
@@ -72,26 +54,36 @@ export default function HeroParallax() {
 
           {/* Text content */}
           <div className="flex-1 text-center md:text-left">
-            <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-6 leading-tight drop-shadow-lg">
-              {words.map((word, i) => (
-                <span
-                  key={i}
-                  className="inline-block mr-[0.3em] transition-all duration-500"
-                  style={{
-                    opacity: isMounted && i < visibleWords ? 1 : 0,
-                    transform: isMounted && i < visibleWords ? "translateY(0)" : "translateY(12px)",
-                  }}
-                >
-                  {word}
-                </span>
-              ))}
+            <h1
+              className="font-heading text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-6 leading-tight drop-shadow-lg"
+              style={{
+                opacity: show ? 1 : 0,
+                transform: show ? "translateY(0)" : "translateY(20px)",
+                transition: "opacity 0.8s ease 0.1s, transform 0.8s ease 0.1s",
+              }}
+            >
+              Experience the Revive Difference
             </h1>
 
-            <p className="text-lg sm:text-xl text-white/90 mb-8 max-w-lg leading-relaxed drop-shadow">
+            <p
+              className="text-lg sm:text-xl text-white/90 mb-8 max-w-lg leading-relaxed drop-shadow"
+              style={{
+                opacity: show ? 1 : 0,
+                transform: show ? "translateY(0)" : "translateY(20px)",
+                transition: "opacity 0.8s ease 0.25s, transform 0.8s ease 0.25s",
+              }}
+            >
               Personalized Hormone &amp; Regenerative Medicine for Your Best Self
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center gap-4">
+            <div
+              className="flex flex-col sm:flex-row items-center gap-4"
+              style={{
+                opacity: show ? 1 : 0,
+                transform: show ? "translateY(0)" : "translateY(20px)",
+                transition: "opacity 0.8s ease 0.4s, transform 0.8s ease 0.4s",
+              }}
+            >
               <a
                 href="/contact"
                 className="inline-flex items-center px-8 py-4 text-base font-medium text-white bg-linear-to-r from-primary to-dark-slate rounded-full hover:opacity-90 transition-opacity shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
@@ -110,7 +102,14 @@ export default function HeroParallax() {
             </div>
 
             {/* Google Reviews mini badge */}
-            <div className="mt-8 flex items-center gap-3 justify-center md:justify-start">
+            <div
+              className="mt-8 flex items-center gap-3 justify-center md:justify-start"
+              style={{
+                opacity: show ? 1 : 0,
+                transform: show ? "translateY(0)" : "translateY(20px)",
+                transition: "opacity 0.8s ease 0.55s, transform 0.8s ease 0.55s",
+              }}
+            >
               <div className="flex items-center gap-1">
                 {[...Array(5)].map((_, i) => (
                   <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">

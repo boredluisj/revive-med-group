@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useInView } from "framer-motion";
@@ -23,16 +23,30 @@ function FadeIn({
   delay?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
+  const inView = useInView(ref, { once: true, margin: "-60px" });
+  const [hasMounted, setHasMounted] = useState(false);
+
+  // Force one render at opacity 0 before allowing transitions
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setHasMounted(true);
+      });
+    });
+  }, []);
+
+  const visible = hasMounted && inView;
 
   return (
     <div
       ref={ref}
       className={className}
       style={{
-        opacity: inView ? 1 : 0,
-        transform: inView ? "translateY(0)" : "translateY(24px)",
-        transition: `opacity 0.6s ease ${delay}s, transform 0.6s ease ${delay}s`,
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(24px)",
+        transition: hasMounted
+          ? `opacity 0.7s cubic-bezier(0.25, 0.1, 0.25, 1) ${delay}s, transform 0.7s cubic-bezier(0.25, 0.1, 0.25, 1) ${delay}s`
+          : "none",
       }}
     >
       {children}
