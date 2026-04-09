@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import Image from "next/image";
 
 const services = [
   { name: "Testosterone Replacement Therapy (TRT)", slug: "testosterone-replacement-therapy" },
@@ -79,16 +78,9 @@ export default function Header() {
           {/* Logo */}
           <Link
             href="/"
-            className="focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
+            className="font-heading text-lg sm:text-xl font-semibold text-primary tracking-wide focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded whitespace-nowrap"
           >
-            <Image
-              src="/logo.svg"
-              alt="Revive Medical Group"
-              width={200}
-              height={28}
-              className="w-[150px] sm:w-[200px] h-auto"
-              priority
-            />
+            REVIVE MEDICAL
           </Link>
 
           {/* Desktop nav */}
