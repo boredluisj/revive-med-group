@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useInView } from "framer-motion";
+import { motion, useInView, useReducedMotion } from "framer-motion";
+import { EASE, fadeUp, staggerContainer, staggerItem, slideInLeft, slideInRight } from "@/lib/animations";
 import HeroParallax from "@/components/HeroParallax";
 import StatsCounter from "@/components/StatsCounter";
 import ServiceCard from "@/components/ServiceCard";
@@ -12,7 +13,7 @@ import HowItWorks from "@/components/HowItWorks";
 import Accordion from "@/components/Accordion";
 import { services } from "@/lib/services";
 
-/* ── Fade-in wrapper ─────────────────────────────────────── */
+/* ── Scroll-triggered fade-up wrapper ──────────────────────── */
 function FadeIn({
   children,
   className = "",
@@ -23,38 +24,68 @@ function FadeIn({
   delay?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
-  const [hasMounted, setHasMounted] = useState(false);
-
-  // Force one render at opacity 0 before allowing transitions
-  useEffect(() => {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        setHasMounted(true);
-      });
-    });
-  }, []);
-
-  const visible = hasMounted && inView;
+  const isInView = useInView(ref, { once: true, margin: "-80px" });
+  const prefersReducedMotion = useReducedMotion();
 
   return (
-    <div
+    <motion.div
       ref={ref}
-      className={className}
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(24px)",
-        transition: hasMounted
-          ? `opacity 0.7s cubic-bezier(0.25, 0.1, 0.25, 1) ${delay}s, transform 0.7s cubic-bezier(0.25, 0.1, 0.25, 1) ${delay}s`
-          : "none",
-      }}
+      className={`${className} opacity-100`}
+      initial={prefersReducedMotion ? {} : { opacity: 0, y: 28 }}
+      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.7, ease: EASE, delay }}
     >
       {children}
-    </div>
+    </motion.div>
   );
 }
 
-/* ── FAQ data ────────────────────────────────────────────── */
+/* ── Stagger group wrapper (for grids) ─────────────────────── */
+function StaggerGroup({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-60px" });
+  const prefersReducedMotion = useReducedMotion();
+
+  return (
+    <motion.div
+      ref={ref}
+      className={className}
+      variants={prefersReducedMotion ? undefined : staggerContainer}
+      initial="hidden"
+      animate={isInView ? "visible" : "hidden"}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/* ── Stagger item (child of StaggerGroup) ──────────────────── */
+function StaggerItem({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const prefersReducedMotion = useReducedMotion();
+
+  return (
+    <motion.div
+      className={`${className} opacity-100`}
+      variants={prefersReducedMotion ? undefined : staggerItem}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/* ── FAQ data ────────────────────────────────────────────────── */
 const faqItems = [
   {
     question: "Is hormone therapy safe?",
@@ -88,7 +119,7 @@ const faqItems = [
   },
 ];
 
-/* ── Stats data ──────────────────────────────────────────── */
+/* ── Stats data ──────────────────────────────────────────────── */
 const statsData = [
   { number: 5000, suffix: "+", label: "Patients Treated" },
   { number: 15, suffix: "+", label: "Years Clinical Experience" },
@@ -96,7 +127,7 @@ const statsData = [
   { number: 12, suffix: "+", label: "Services Offered" },
 ];
 
-/* ── Testimonials data ───────────────────────────────────── */
+/* ── Testimonials data ───────────────────────────────────────── */
 const testimonials = [
   {
     author: "Eduardo Andres",
@@ -118,7 +149,7 @@ const testimonials = [
   },
 ];
 
-/* ── Credentials data ────────────────────────────────────── */
+/* ── Credentials data ────────────────────────────────────────── */
 const credentials = [
   {
     icon: "🎓",
@@ -146,7 +177,7 @@ const credentials = [
   },
 ];
 
-/* ── Symptoms data ───────────────────────────────────────── */
+/* ── Symptoms data ───────────────────────────────────────────── */
 const symptoms = [
   "Constant fatigue no matter how much you sleep",
   "Sexual dysfunction or low libido",
@@ -156,7 +187,7 @@ const symptoms = [
   "Mood swings, irritability, or anxiety",
 ];
 
-/* ── Page Content ────────────────────────────────────────── */
+/* ── Page Content ────────────────────────────────────────────── */
 export default function HomeContent() {
   return (
     <>
@@ -175,9 +206,9 @@ export default function HomeContent() {
             </p>
           </FadeIn>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {credentials.map((cred, i) => (
-              <FadeIn key={cred.label} delay={i * 0.1} className="text-center">
+          <StaggerGroup className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {credentials.map((cred) => (
+              <StaggerItem key={cred.label} className="text-center">
                 <div className="text-4xl mb-3">{cred.icon}</div>
                 <h3 className="font-heading text-lg font-semibold text-dark-slate mb-1">
                   {cred.label}
@@ -185,11 +216,11 @@ export default function HomeContent() {
                 <p className="text-sm text-primary/70 leading-relaxed">
                   {cred.description}
                 </p>
-              </FadeIn>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerGroup>
 
-          <FadeIn delay={0.4} className="text-center mt-10">
+          <FadeIn delay={0.2} className="text-center mt-10">
             <p className="text-sm text-primary/60 max-w-xl mx-auto">
               Chad combines advanced education, military-grade discipline, and a
               genuine passion for helping patients reclaim their health.
@@ -207,9 +238,9 @@ export default function HomeContent() {
             </h2>
           </FadeIn>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
+          <StaggerGroup className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
             {symptoms.map((symptom, i) => (
-              <FadeIn key={i} delay={i * 0.08} className="flex items-start gap-3">
+              <StaggerItem key={i} className="flex items-start gap-3">
                 <svg
                   className="w-6 h-6 text-secondary flex-shrink-0 mt-0.5"
                   fill="none"
@@ -224,11 +255,11 @@ export default function HomeContent() {
                   />
                 </svg>
                 <span className="text-white/90">{symptom}</span>
-              </FadeIn>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerGroup>
 
-          <FadeIn delay={0.5} className="text-center mt-12">
+          <FadeIn delay={0.3} className="text-center mt-12">
             <p className="text-xl font-heading font-semibold text-secondary mb-6">
               You&apos;re Not Alone. Let&apos;s Fix This.
             </p>
@@ -255,18 +286,18 @@ export default function HomeContent() {
             </p>
           </FadeIn>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {services.map((service, i) => (
-              <FadeIn key={service.slug} delay={i * 0.05}>
+          <StaggerGroup className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {services.map((service) => (
+              <StaggerItem key={service.slug}>
                 <ServiceCard
                   title={service.title}
                   description={service.description}
                   image={service.image}
                   slug={service.slug}
                 />
-              </FadeIn>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerGroup>
         </div>
       </section>
 
@@ -317,8 +348,7 @@ export default function HomeContent() {
                 treat the root cause. Chad does not push products or rush
                 through appointments. He takes the time to understand what each
                 patient is going through and builds a plan around their unique
-                biology and goals. His focus is on regenerative medicine, hormone
-                optimization, and helping patients feel like themselves again.
+                biology and goals.
               </p>
               <p className="text-primary/80 leading-relaxed mb-6">
                 Whether you are dealing with fatigue, weight gain, hormonal
@@ -343,7 +373,6 @@ export default function HomeContent() {
             <h2 className="font-heading text-3xl sm:text-4xl font-bold text-dark-slate mb-3">
               What Our Patients Say
             </h2>
-            {/* Google Reviews badge */}
             <div className="flex items-center justify-center gap-3 mt-4">
               <div className="flex items-center gap-0.5">
                 {[...Array(5)].map((_, i) => (
@@ -358,20 +387,19 @@ export default function HomeContent() {
             </div>
           </FadeIn>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((t, i) => (
-              <FadeIn key={t.author} delay={i * 0.1}>
+          <StaggerGroup className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {testimonials.map((t) => (
+              <StaggerItem key={t.author}>
                 <Testimonial
                   quote={t.quote}
                   author={t.author}
                   rating={t.rating}
                 />
-              </FadeIn>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerGroup>
 
-          {/* Additional review quote */}
-          <FadeIn delay={0.3} className="mt-8">
+          <FadeIn delay={0.2} className="mt-8">
             <div className="bg-white rounded-xl p-6 max-w-2xl mx-auto border-l-4 border-primary shadow-sm">
               <p className="text-primary/80 italic leading-relaxed">
                 &quot;Very friendly staff, very knowledgeable. They will tell you everything up front and work up a best plan going forward.&quot;

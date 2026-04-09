@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
-import { useInView } from "framer-motion";
+import { motion, useInView, useReducedMotion } from "framer-motion";
+import { EASE, staggerContainer, staggerItem } from "@/lib/animations";
 
 interface Stat {
   number: number;
@@ -30,7 +31,6 @@ function CountUp({ target, suffix = "", inView }: { target: number; suffix: stri
     const animate = (currentTime: number) => {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      // Smooth ease-out cubic
       const eased = 1 - Math.pow(1 - progress, 3);
       setCount(Math.round(startValue + eased * (target - startValue)));
 
@@ -52,39 +52,29 @@ function CountUp({ target, suffix = "", inView }: { target: number; suffix: stri
 
 export default function StatsCounter({ stats }: StatsCounterProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
-  const [hasMounted, setHasMounted] = useState(false);
-
-  useEffect(() => {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        setHasMounted(true);
-      });
-    });
-  }, []);
-
-  const visible = hasMounted && inView;
+  const isInView = useInView(ref, { once: true, margin: "-60px" });
+  const prefersReducedMotion = useReducedMotion();
 
   return (
-    <div ref={ref} className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+    <motion.div
+      ref={ref}
+      className="grid grid-cols-2 lg:grid-cols-4 gap-8"
+      variants={prefersReducedMotion ? undefined : staggerContainer}
+      initial="hidden"
+      animate={isInView ? "visible" : "hidden"}
+    >
       {stats.map((stat, index) => (
-        <div
+        <motion.div
           key={index}
-          className="text-center"
-          style={{
-            opacity: visible ? 1 : 0,
-            transform: visible ? "translateY(0)" : "translateY(24px)",
-            transition: hasMounted
-              ? `opacity 0.7s cubic-bezier(0.25, 0.1, 0.25, 1) ${index * 0.1}s, transform 0.7s cubic-bezier(0.25, 0.1, 0.25, 1) ${index * 0.1}s`
-              : "none",
-          }}
+          className="text-center opacity-100"
+          variants={prefersReducedMotion ? undefined : staggerItem}
         >
           <p className="text-5xl font-heading font-bold text-dark-slate mb-2">
-            <CountUp target={stat.number} suffix={stat.suffix || ""} inView={visible} />
+            <CountUp target={stat.number} suffix={stat.suffix || ""} inView={isInView} />
           </p>
           <p className="text-base text-primary/70">{stat.label}</p>
-        </div>
+        </motion.div>
       ))}
-    </div>
+    </motion.div>
   );
 }

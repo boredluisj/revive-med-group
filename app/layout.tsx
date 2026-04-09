@@ -4,6 +4,8 @@ import { localBusinessSchema } from "@/lib/schema";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ScrollProgress from "@/components/ScrollProgress";
+import LenisProvider from "@/components/LenisProvider";
+import FloatingCTA from "@/components/FloatingCTA";
 import "@/styles/globals.css";
 
 export const metadata: Metadata = {
@@ -49,6 +51,7 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <LenisProvider />
         <ScrollProgress />
         <a href="#main" className="skip-link">
           Skip to main content
@@ -56,6 +59,7 @@ export default function RootLayout({
         <Header />
         <main id="main">{children}</main>
         <Footer />
+        <FloatingCTA />
       </body>
     </html>
   );

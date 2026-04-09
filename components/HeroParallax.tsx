@@ -1,21 +1,33 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { motion, useReducedMotion } from "framer-motion";
+import { EASE, wordStagger, wordItem, fadeUp, fadeIn } from "@/lib/animations";
+
+const HEADLINE = "Experience the Revive Difference";
 
 export default function HeroParallax() {
-  const [show, setShow] = useState(false);
-  const heroRef = useRef<HTMLElement>(null);
+  const prefersReducedMotion = useReducedMotion();
 
-  useEffect(() => {
-    // Single smooth fade-in for all hero content
-    const timer = setTimeout(() => setShow(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
+  const containerVariants = {
+    hidden: {},
+    visible: {
+      transition: { staggerChildren: 0.18, delayChildren: 0.05 },
+    },
+  };
+
+  const blockVariant = (delay = 0) => ({
+    hidden: prefersReducedMotion ? {} : { opacity: 0, y: 28 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.75, ease: EASE, delay },
+    },
+  });
 
   return (
-    <section ref={heroRef} className="relative min-h-[90vh] md:min-h-screen overflow-hidden">
-      {/* Static hero background */}
+    <section className="relative min-h-[90vh] md:min-h-screen overflow-hidden">
+      {/* Background */}
       <Image
         src="/images/hero/hero-bg.png"
         alt="Warm inviting medical clinic reception area with cream walls and soft natural lighting"
@@ -25,20 +37,24 @@ export default function HeroParallax() {
         sizes="100vw"
       />
 
-      {/* Dark overlay for text readability */}
-      <div className="absolute inset-0 bg-linear-to-r from-black/50 via-black/30 to-transparent" />
+      {/* Overlay */}
+      <motion.div
+        className="absolute inset-0 bg-linear-to-r from-black/55 via-black/35 to-transparent"
+        initial={prefersReducedMotion ? {} : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.0, ease: "easeOut" }}
+      />
 
       {/* Content */}
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14 md:py-24 flex items-center min-h-[90vh] md:min-h-screen">
         <div className="flex flex-col md:flex-row items-center gap-10 md:gap-16 w-full">
-          {/* Chad's headshot - hidden on mobile */}
-          <div
+
+          {/* Chad headshot — desktop only */}
+          <motion.div
             className="hidden md:block w-full md:w-[40%] flex-shrink-0"
-            style={{
-              opacity: show ? 1 : 0,
-              transform: show ? "translateY(0)" : "translateY(20px)",
-              transition: "opacity 0.8s ease, transform 0.8s ease",
-            }}
+            variants={blockVariant(0.1)}
+            initial="hidden"
+            animate="visible"
           >
             <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl max-w-sm mx-auto">
               <Image
@@ -50,39 +66,46 @@ export default function HeroParallax() {
                 priority
               />
             </div>
-          </div>
+          </motion.div>
 
           {/* Text content */}
           <div className="flex-1 text-center md:text-left">
-            <h1
-              className="font-heading text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-6 leading-tight drop-shadow-lg"
-              style={{
-                opacity: show ? 1 : 0,
-                transform: show ? "translateY(0)" : "translateY(20px)",
-                transition: "opacity 0.8s ease 0.1s, transform 0.8s ease 0.1s",
-              }}
-            >
-              Experience the Revive Difference
-            </h1>
 
-            <p
+            {/* Word-by-word H1 */}
+            <motion.h1
+              className="font-heading text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-6 leading-tight drop-shadow-lg"
+              variants={prefersReducedMotion ? undefined : wordStagger}
+              initial="hidden"
+              animate="visible"
+              aria-label={HEADLINE}
+            >
+              {HEADLINE.split(" ").map((word, i) => (
+                <motion.span
+                  key={i}
+                  variants={prefersReducedMotion ? undefined : wordItem}
+                  className="inline-block mr-[0.25em]"
+                >
+                  {word}
+                </motion.span>
+              ))}
+            </motion.h1>
+
+            {/* Subtitle */}
+            <motion.p
               className="text-lg sm:text-xl text-white/90 mb-8 max-w-lg leading-relaxed drop-shadow"
-              style={{
-                opacity: show ? 1 : 0,
-                transform: show ? "translateY(0)" : "translateY(20px)",
-                transition: "opacity 0.8s ease 0.25s, transform 0.8s ease 0.25s",
-              }}
+              variants={blockVariant(0.55)}
+              initial="hidden"
+              animate="visible"
             >
               Personalized Hormone &amp; Regenerative Medicine for Your Best Self
-            </p>
+            </motion.p>
 
-            <div
+            {/* CTAs */}
+            <motion.div
               className="flex flex-col sm:flex-row items-center gap-4"
-              style={{
-                opacity: show ? 1 : 0,
-                transform: show ? "translateY(0)" : "translateY(20px)",
-                transition: "opacity 0.8s ease 0.4s, transform 0.8s ease 0.4s",
-              }}
+              variants={blockVariant(0.7)}
+              initial="hidden"
+              animate="visible"
             >
               <a
                 href="/contact"
@@ -99,16 +122,14 @@ export default function HeroParallax() {
                 </svg>
                 843-299-9000
               </a>
-            </div>
+            </motion.div>
 
-            {/* Google Reviews mini badge */}
-            <div
+            {/* Google Reviews badge */}
+            <motion.div
               className="mt-8 flex items-center gap-3 justify-center md:justify-start"
-              style={{
-                opacity: show ? 1 : 0,
-                transform: show ? "translateY(0)" : "translateY(20px)",
-                transition: "opacity 0.8s ease 0.55s, transform 0.8s ease 0.55s",
-              }}
+              variants={blockVariant(0.85)}
+              initial="hidden"
+              animate="visible"
             >
               <div className="flex items-center gap-1">
                 {[...Array(5)].map((_, i) => (
@@ -118,7 +139,7 @@ export default function HeroParallax() {
                 ))}
               </div>
               <span className="text-white/80 text-sm font-medium">4.9/5 from 75 Google Reviews</span>
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>
